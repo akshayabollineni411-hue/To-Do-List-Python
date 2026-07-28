@@ -1,4 +1,22 @@
-tasks = []
+import json
+
+FILE_NAME = "tasks.json"
+
+
+def load_tasks():
+    try:
+        with open(FILE_NAME, "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []
+
+
+def save_tasks():
+    with open(FILE_NAME, "w") as file:
+        json.dump(tasks, file, indent=4)
+
+
+tasks = load_tasks()
 
 while True:
     print("\n===== TO-DO LIST =====")
@@ -13,6 +31,7 @@ while True:
     if choice == "1":
         task = input("Enter a new task: ")
         tasks.append({"task": task, "completed": False})
+        save_tasks()
         print("Task added successfully!")
 
     elif choice == "2":
@@ -30,14 +49,19 @@ while True:
         else:
             for i, item in enumerate(tasks, start=1):
                 print(f"{i}. {item['task']}")
-            
-            number = int(input("Enter task number to delete: "))
 
-            if 1 <= number <= len(tasks):
-                tasks.pop(number - 1)
-                print("Task deleted successfully!")
-            else:
-                print("Invalid task number.")
+            try:
+                number = int(input("Enter task number to delete: "))
+
+                if 1 <= number <= len(tasks):
+                    tasks.pop(number - 1)
+                    save_tasks()
+                    print("Task deleted successfully!")
+                else:
+                    print("Invalid task number.")
+
+            except ValueError:
+                print("Please enter a valid number.")
 
     elif choice == "4":
         if not tasks:
@@ -46,13 +70,18 @@ while True:
             for i, item in enumerate(tasks, start=1):
                 print(f"{i}. {item['task']}")
 
-            number = int(input("Enter task number to mark as completed: "))
+            try:
+                number = int(input("Enter task number to mark as completed: "))
 
-            if 1 <= number <= len(tasks):
-                tasks[number - 1]["completed"] = True
-                print("Task marked as completed!")
-            else:
-                print("Invalid task number.")
+                if 1 <= number <= len(tasks):
+                    tasks[number - 1]["completed"] = True
+                    save_tasks()
+                    print("Task marked as completed!")
+                else:
+                    print("Invalid task number.")
+
+            except ValueError:
+                print("Please enter a valid number.")
 
     elif choice == "5":
         print("Thank you for using the To-Do List!")
